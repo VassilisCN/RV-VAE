@@ -4,7 +4,6 @@ from .rv_relu import RandomVariableReLU
 from .rv_losses import Mahalanobis_classification_distance as MahalanobisLoss
 from .rv_losses import RandomVariableMSELoss
 from .rv_losses import RandomVariableCE_MSELoss
-from .rv_losses import KullbackLeiblerLoss
 from .rv_losses import Z_testLoss
 from .rv_losses import CustomLoss
 from .rv_losses import BhattacharyyaLoss

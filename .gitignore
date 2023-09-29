@@ -1,2 +1,3 @@
 *.pyc
 *.npz
+.docker_run

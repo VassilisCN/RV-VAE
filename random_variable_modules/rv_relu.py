@@ -1,6 +1,5 @@
 import torch, math
 import numpy as np
-import pyro
 from torch._C import device
 
 
