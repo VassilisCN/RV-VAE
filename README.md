@@ -5,6 +5,8 @@
 [**Paper**](http://users.ics.forth.gr/~argyros/mypapers/2023_10_VIPRIORS_Nicodemou.pdf) | 
 [**Citation**](#citation) 
 
+![RV-VAE Concept Figure](https://github.com/VassilisCN/RV-VAE/blob/main/RV-VAE%20Concept%20Figure.png)
+
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
