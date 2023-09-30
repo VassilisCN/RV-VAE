@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="train Soft-IntroVAE")
     parser.add_argument("-d", "--dataset", type=str,
                         help="dataset to train on: ['cifar10', 'mnist', 'fmnist', 'svhn', 'monsters128', 'celeb128', "
-                             "'celeb256', 'celeb1024']", default="celeb128")
+                             "'celeb256', 'celeb1024']", default="mnist")
     parser.add_argument("-n", "--num_epochs", type=int, help="total number of epochs to run", default=150)
     parser.add_argument("-z", "--z_dim", type=int, help="latent dimensions", default=256)
     parser.add_argument("-l", "--lr", type=float, help="learning rate", default=2e-4)
