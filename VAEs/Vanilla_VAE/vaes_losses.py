@@ -2,7 +2,6 @@ import torch, torchvision, cv2
 from torchvision import transforms
 import torchvision.datasets as datasets
 import matplotlib.pyplot as plt
-from models import *
 from vaes_models import *
 import numpy as np
 
