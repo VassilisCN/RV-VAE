@@ -40,6 +40,8 @@ In order to use any of the `random_variable_modules`, you can edit your `PYTHONP
 
 All `random_variable_modules` take as input `x` a Pytorch tensor of shape `(B, 2, ...)`, where `B` is the batch size. Also, they accept the same arguments as their non-RV counterparts. For specific shape sizes and outputs, you can see the comments in each module.
 
+For examples of how to use them, you can refer to each of the individual [VAE-based architecture](https://github.com/VassilisCN/RV-VAE/tree/main/VAEs) modifications. Specifically, if you find in the code the flag `rv`, the `if` statement containing this flag changes the specific part of the code from the original to the RV-aware one.
+
 ### RV-VAEs
 
 Each VAE architecture is used as each of their original authors suggested respectively. For each architecture, you will also find their respective README files for reference. All architectures are set to train in RV-aware mode.
