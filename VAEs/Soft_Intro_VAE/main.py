@@ -42,13 +42,15 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--pretrained", type=str, help="path to pretrained model, to continue training",
                         default="None")
     parser.add_argument("-c", "--device", type=int, help="device: -1 for cpu, 0 and up for specific cuda device",
-                        default=1)
+                        default=0)
     parser.add_argument('-f', "--fid", action='store_true', help="if specified, FID wil be calculated during training")
+    parser.add_argument('-no_rv', '--no_random_variable', action='store_false', help="if specified, RV awarness will be disabled")
     args = parser.parse_args()
 
     device = torch.device("cpu") if args.device <= -1 else torch.device("cuda:" + str(args.device))
     print("Device: ", device)
 
+    rv = args.no_random_variable
     start_epoch = 0
     pretrained = None if args.pretrained == "None" else args.pretrained
     h_p = hyp_params[args.dataset]
@@ -62,4 +64,4 @@ if __name__ == "__main__":
                          num_vae=args.num_vae, beta_kl=args.beta_kl, beta_neg=args.beta_neg, beta_rec=args.beta_rec,
                          device=device, save_interval=50, start_epoch=start_epoch, lr_e=args.lr, lr_d=args.lr,
                          pretrained=pretrained, seed=1234,
-                         test_iter=1000, with_fid=args.fid, rv=True)
+                         test_iter=1000, with_fid=args.fid, rv=rv)

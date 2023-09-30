@@ -1,18 +1,34 @@
-import sys, os
-
-from torch.functional import split
-import torch, torchvision, cv2
+import torch, torchvision
 from torchvision import transforms
 import torchvision.datasets as datasets
 import matplotlib.pyplot as plt
 from vaes_models import *
 from vaes_losses import *
 import numpy as np
-from torch.utils.data import Dataset, DataLoader
-import copy
+dts = {0:'MNIST', 1:'CIFAR10', 2:'CelebA'}
 
-torch.manual_seed(111)
-np.random.seed(111) 
+
+#############################################
+# Arguments
+#############################################
+seed = 123
+
+dataset = 0 # Can choose from {0:'MNIST', 1:'CIFAR10', 2:'CelebA'}
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+save_model = True
+latent_dim = 2
+lr = 0.005 # Learning rate
+batch_size = 64
+epochs = 4
+exp_name = "VAE_{}".format(dts[dataset]) # Destination and name of saved model file
+rv = True # Enable RV awarness
+#############################################
+# Arguments
+#############################################
+
+torch.manual_seed(seed)
+np.random.seed(seed) 
 # torch.backends.cudnn.deterministic = True
 # torch.backends.cudnn.benchmark = False
 
@@ -27,38 +43,38 @@ def data_transforms():
                                     SetRange])
     return transform
 
-def show_image(x):
+def show_image(x, name=None):
     x = (x + 1) / 2
     fig = plt.figure()
     plt.imshow(np.transpose(x.cpu().numpy(), (1, 2, 0)))
-    plt.show()
+    if name:
+        plt.savefig('ims_{}.png'.format(name))
+    else:
+        plt.show()
 
-# celeba_trainset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms.Compose([transforms.ToTensor(),transforms.Resize(64)]))
-# celeba_testset = datasets.MNIST(root='./data', train=False, download=True, transform=transforms.Compose([transforms.ToTensor(),transforms.Resize(64)]))
 
-# celeba_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=data_transforms())
-# celeba_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=data_transforms())
+if dataset==0:
+    celeba_trainset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms.Compose([transforms.ToTensor(),transforms.Resize(64)]))
+    celeba_testset = datasets.MNIST(root='./data', train=False, download=True, transform=transforms.Compose([transforms.ToTensor(),transforms.Resize(64)]))
+elif dataset==1:
+    celeba_trainset = datasets.CIFAR10(root='./data', train=True, download=True, transform=data_transforms())
+    celeba_testset = datasets.CIFAR10(root='./data', train=False, download=True, transform=data_transforms())
+elif dataset==2:
+    celeba_trainset = datasets.CelebA(root='./data', split='train', download=True, transform=data_transforms())
+    celeba_testset = datasets.CelebA(root='./data', split='test', download=True, transform=data_transforms())
+else:
+    raise NotImplementedError("dataset is not supported")
 
-celeba_trainset = datasets.CelebA(root='./data', split='train', download=True, transform=data_transforms())
-celeba_testset = datasets.CelebA(root='./data', split='test', download=True, transform=data_transforms())
-
-train_dataloader = torch.utils.data.DataLoader(celeba_trainset, batch_size=64, shuffle=True, drop_last=True)
-val_dataloader = torch.utils.data.DataLoader(celeba_testset, batch_size=32, shuffle=False, drop_last=True)
+train_dataloader = torch.utils.data.DataLoader(celeba_trainset, batch_size=batch_size, shuffle=True, drop_last=True)
+val_dataloader = torch.utils.data.DataLoader(celeba_testset, batch_size=batch_size, shuffle=False, drop_last=True)
 dataiter = iter(train_dataloader)
-images, labels = dataiter.next()
+images, labels = next(dataiter)
 # show_image(torchvision.utils.make_grid(images))
 
 print("Training dataset size: ", len(celeba_trainset))
 print("Validation dataset size: ", len(celeba_testset))
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(device)
-
-save_model = True
-latent_dim = 128 # 128
-epochs = 100
-exp_name = "dont_careness_storage2/VAE_Celeba_KLD_N_0_4_no_batchtrack" # "models/WAE_MMD" # 
-rv = True
 
 if rv:
     model_name = exp_name + '_RV.pt'
@@ -67,16 +83,10 @@ else:
 
 # torch.autograd.set_detect_anomaly(True)
 model = VanillaVAE(in_channels=images[0].shape[0], latent_dim=latent_dim, rv=rv).to(device)
-# model = BetaTCVAE(in_channels=images[0].shape[0], latent_dim=latent_dim, rv=rv).to(device)
-# model.load_state_dict(torch.load(model_name))
+
 loss_function = VanillaLoss
-# loss_function = BetaTCVAELoss
-# def count_parameters(model):
-#     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-# print('Network\'s trainable parameters:', count_parameters(model))
-
-optimizer = torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=0.0)
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.0)
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.95)
 print("Start training VAE...")
 best_val_loss = 999999
@@ -93,16 +103,10 @@ for epoch in range(epochs):
         x = x.to(device)
 
         optimizer.zero_grad()
-        with torch.autograd.profiler.profile(use_cuda=True,with_stack=True) as prof:
-            x_hat, mean, log_var = model(x)
-        print(prof.key_averages(group_by_stack_n=5).table(sort_by="self_cuda_time_total", row_limit=10))
+        x_hat, mean, log_var = model(x)
 
         loss, kld = loss_function(x, x_hat, mean, log_var, celeba_trainset, rv)
 
-        # x_hat, mean, log_var, z = model(x)
-
-        # loss, _, kld = loss_function(x_hat, x, mean, log_var, z, celeba_trainset, model, rv)
-        # print(loss.item(), kld.item())
         total_train_loss += loss.item()
         total_kld += kld.item()
 
@@ -121,7 +125,6 @@ for epoch in range(epochs):
             x = x.to(device)
             
             x_hat, _, _ = model(x)
-            # x_hat, _, _, _ = model(x)
             if rv:
                 loss = criterion(x, x_hat[:,0,...])
             else:
@@ -143,7 +146,10 @@ plt.xlabel('Epochs')
 plt.ylabel('Training Loss')
 plt.title("Train Loss Plot")
 # plt.legend(loc='upper right')
-plt.show()
+if rv:
+    plt.savefig('train_rec_rv.png')
+else:
+    plt.savefig('train_rec.png')
 
 fig=plt.figure(figsize=(10, 5))
 plt.plot(np.arange(1, epochs+1), kld_loss, label="KLD loss")
@@ -151,7 +157,10 @@ plt.xlabel('Epochs')
 plt.ylabel('KLD Loss')
 plt.title("KLD Loss Plot")
 # plt.legend(loc='upper right')
-plt.show()
+if rv:
+    plt.savefig('train_kld_rv.png')
+else:
+    plt.savefig('train_kld.png')
 
 fig=plt.figure(figsize=(10, 5))
 plt.plot(np.arange(1, epochs+1), val_loss, label="Validation loss")
@@ -159,7 +168,10 @@ plt.xlabel('Epochs')
 plt.ylabel('Validation Loss')
 plt.title("Validation Loss Plot")
 # plt.legend(loc='upper right')
-plt.show()
+if rv:
+    plt.savefig('val_loss_rv.png')
+else:
+    plt.savefig('val_loss.png')
 
 import pickle
 if rv:
@@ -177,12 +189,11 @@ else:
     with open(exp_name + "val_losses.txt", "wb") as fp:
         val = pickle.dump(val_loss, fp)
 
-show_image(torchvision.utils.make_grid(x))
+show_image(torchvision.utils.make_grid(x), name='input')
 if rv:
-    show_image(torchvision.utils.make_grid(x_hat[:,0,...]))
-    # print('MEAN',torch.mean(x_hat[:,1,...]))
+    show_image(torchvision.utils.make_grid(x_hat[:,0,...]), name='recs')
 else:
-    show_image(torchvision.utils.make_grid(x_hat))
+    show_image(torchvision.utils.make_grid(x_hat), name='recs')
 
 range1 = torch.arange(-2,2,0.2)
 range2 = torch.arange(-2,2,0.2)
@@ -200,7 +211,6 @@ with torch.no_grad():
     generated_images = model.decode(z)
     print(generated_images.shape)
     if rv:
-        show_image(torchvision.utils.make_grid(generated_images[:,0,...],range1.shape[0]))
+        show_image(torchvision.utils.make_grid(generated_images[:,0,...],range1.shape[0]), name='gens')
     else:
-        show_image(torchvision.utils.make_grid(generated_images,range1.shape[0]))
-    # show_image(generated_images[:,0,...])
+        show_image(torchvision.utils.make_grid(generated_images,range1.shape[0]), name='gens')

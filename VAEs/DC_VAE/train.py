@@ -33,7 +33,7 @@ cont_temp          = 0.07
 # multi-scale contrastive setting
 layers             = ["b1", "final"]
 
-name =("new_ver2").join(layers)
+name =("new_ver").join(layers)
 if rv:
     log_fname = f"logs/cifar10-{name}_rv"
     fid_fname = f"logs/FID_cifar10-{name}_rv"

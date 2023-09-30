@@ -6,18 +6,19 @@ from torch._C import device
 class RandomVariableReLU(torch.nn.Module):
     def __init__(self):
         super(RandomVariableReLU, self).__init__()
-        self.normdis = torch.distributions.Normal(torch.tensor([0.0], device='cuda'), torch.tensor([1.0], device='cuda')) # carefull with device
+        self.normdis = torch.distributions.Normal(0.0, 1.0) 
 
     def forward(self, input):
         """
         Input: (N,2,∗) where * means, any number of additional dimensions
         Output: (N,2,∗)
         """
-        epsilon = 1e10 # epsilon for negative variances later
+        epsilon = 1e-10 # epsilon for negative variances later
         means = input[:, 0, ...] 
         varis = input[:, 1, ...]
-        
-        a = -means/(varis**0.5)
+
+        r_varis = (varis+epsilon)**0.5
+        a = -means/r_varis
         a = a.double() # temporary double precision for more accurate estimations
         
         phi_a = self.normdis.log_prob(a).exp()
@@ -28,11 +29,11 @@ class RandomVariableReLU(torch.nn.Module):
         # E[c∣X≤c] = c
         # a = (c - μ) / σ
         # can add abs() on varis for the pytorch "bug"
-        est_means_clean = (1-Phi_a)*means + (varis**0.5)*phi_a 
+        est_means_clean = (1-Phi_a)*means + r_varis*phi_a 
         # Var[max(X,c)] = Var[X|X>c]Pr[X>c]+E[X|X>c]^2(1-Pr[X>c])Pr[X>c]
         # Var[X|X>c] = Lower tail truncated normal distribution variance
-        # Sometimes this gives variances < 0 but its numeric error that in next layers is fixed by adding an other epsilon
-        est_varis_raw = (1-Phi_a) * (varis + (means**2)*Phi_a) + (varis**0.5)*phi_a*(2*means*Phi_a - means - (varis**0.5)*phi_a)
+        # Sometimes this gives variances < 0 but its numeric error that is fixed by adding an epsilon r_varis
+        est_varis_raw = (1-Phi_a) * (varis + (means**2)*Phi_a) + r_varis*phi_a*(2*means*Phi_a - means - r_varis*phi_a)
 
         est_varis = torch.where(est_varis_raw<=0, epsilon, est_varis_raw).float()
         # if est_varis.isnan().any():

@@ -40,6 +40,7 @@ You should use the `main.py` file with the following arguments:
 |-p, --pretrained     | path to pretrained model, to continue training	 	|str: default="None"	|
 |-c, --device| device: -1 for cpu, 0 and up for specific cuda device						|int: default=-1|
 |-f, --fid| if specified, FID wil be calculated during training				|bool: default=False|
+|-no_rv, --no_random_variable| if specified, RV awarness will be disabled				|bool: default=False|
 
 Examples:
 

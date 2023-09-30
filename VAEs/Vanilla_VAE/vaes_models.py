@@ -1,4 +1,3 @@
-from torchsummary import summary
 from random_variable_modules import *
 import torch
 from torch import nn
@@ -82,9 +81,9 @@ class VanillaVAE(nn.Module):
                                 RandomVariableReLU(),
                                 # nn.LeakyReLU(),
                                 RandomVariableConv2d(hidden_dims[-1], out_channels= in_out_channels,
-                                        kernel_size= 3, padding= 1),
+                                        kernel_size= 3, padding= 1))#,
                                 # nn.Sigmoid())
-                                nn.Tanh())
+                                # nn.Tanh())
         else:
             self.final_layer = nn.Sequential(
                                 nn.ConvTranspose2d(hidden_dims[-1],
@@ -97,9 +96,9 @@ class VanillaVAE(nn.Module):
                                 nn.ReLU(),
                                 # nn.LeakyReLU(),
                                 nn.Conv2d(hidden_dims[-1], out_channels= in_out_channels,
-                                        kernel_size= 3, padding= 1),
+                                        kernel_size= 3, padding= 1))#,
                                 # nn.Sigmoid())
-                                nn.Tanh())
+                                # nn.Tanh())
         
     def encode(self, input):
         """
@@ -143,21 +142,19 @@ class VanillaVAE(nn.Module):
         """
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        # eps = torch.ones_like(std)
         return eps * std + mu
 
     def forward(self, input, **kwargs):
         if self.rv:
-            mu, log_var = self.encode(input) #iason's idea
-            # log_var = torch.zeros(mu.shape, device=mu.device) #iason's idea
+            mu, log_var = self.encode(input) 
             out_mean = torch.unsqueeze(mu, 1) # At dim = 1 we have our dist_params
             var      = torch.exp(log_var)
             out_var  = torch.unsqueeze(var, 1)
             z = torch.cat((out_mean, out_var), 1)
-            if out_mean.isnan().any() or out_var.isnan().any():
-                print(torch.mean(out_mean), torch.mean(out_var))
-                print('HAS NANS IN: ', self.__class__.__name__)
-                raise ValueError
+            # if out_mean.isnan().any() or out_var.isnan().any():
+            #     print(torch.mean(out_mean), torch.mean(out_var))
+            #     print('HAS NANS IN: ', self.__class__.__name__)
+            #     raise ValueError
         else:
             mu, log_var = self.encode(input)
             z = self.reparameterize(mu, log_var)

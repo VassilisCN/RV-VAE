@@ -479,6 +479,7 @@ def train_soft_intro_vae(dataset='cifar10', z_dim=128, lr_e=2e-4, lr_d=2e-4, bat
     :param num_row: number of images in a row gor the sample image saving
     :param gamma_r: coefficient for the reconstruction loss for fake data in the decoder
     :param with_fid: calculate FID during training (True/False)
+    :param rv: Enable RV awarness (True/False)
     :return:
     """
     if seed != -1:
@@ -562,7 +563,7 @@ def train_soft_intro_vae(dataset='cifar10', z_dim=128, lr_e=2e-4, lr_d=2e-4, bat
 
     if pretrained is not None:
         load_model(model, pretrained, device)
-    print(model)
+    print(model, 'RV:{}'.format(rv))
 
     fig_dir = './figures_' + dataset +'_rv' if rv else './figures_' + dataset
     os.makedirs(fig_dir, exist_ok=True)
