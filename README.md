@@ -51,19 +51,19 @@ You can start the training procedure in each architecture like so:
 #### Soft-Intro-VAE
 
 ```bash
-python3 RV_VAE/VAEs/Soft_Intro_VAE/main.py
+python3 VAEs/Soft_Intro_VAE/main.py
 ```
 
 #### DC-VAE
 
 ```bash
-python3 RV_VAE/VAEs/DC_VAE/train.py
+python3 VAEs/DC_VAE/train.py
 ```
 
 #### Vanilla VAE
 
 ```bash
-python3 RV_VAE/VAEs/Vanilla_VAE/train.py
+python3 VAEs/Vanilla_VAE/train.py
 ```
 You can check each of these three files individually to change any parameters/datasets.
 
