@@ -67,7 +67,7 @@ You can check each of these three files individually to change any parameters/da
 
 ## Citation
 
-If you include in your research any parts of this project, please cite each respective work individually as well as this work:
+If you include in your research Random Variable Modules or any parts of this project, please cite each respective work, if applicable, as well as this work:
 ```
 @inproceedings{Nicodemou023,
   author = {Nicodemou, Vassilis C and Oikonomidis, Iason and Argyros, Antonis},
