@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 RUN apt install sudo
 
 # Install pip requirements
-run mkdir RV_VAE
+RUN mkdir RV_VAE
 COPY . /RV_VAE
-RUN pip install -r requirements.txt
+RUN pip install -r /RV_VAE/requirements.txt
 WORKDIR /RV_VAE
