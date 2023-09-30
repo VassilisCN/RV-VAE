@@ -1,7 +1,7 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 FROM python:3.8-slim
 FROM nvidia/cuda:11.7.0-cudnn8-runtime-ubuntu20.04
-
+ARG DEBIAN_FRONTEND=noninteractive
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
 
