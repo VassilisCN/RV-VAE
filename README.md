@@ -38,7 +38,7 @@ Alternatively, you can install everything in the `requirements.txt` with Python 
 
 In order to use any of the `random_variable_modules`, you can edit your `PYTHONPATH` environment variable to include the modules folder and then import them in your code.
 
-All `random_variable_modules` take as input `x` a Pytorch tensor of shape `(B, 2, ...)`, where `B` is the batch size. Also, they accept the same arguments as their non-RV counterparts. For specific shape sizes and outputs, you can see the comments in each module.
+All `random_variable_modules` take as input `x` a Pytorch tensor of shape `(B, 2, ...)`, where `B` is the batch size, and the second dimension holds the two Distribution parameters/moments (means, variances). Also, they accept the same arguments as their non-RV counterparts. For specific shape sizes and outputs, you can see the comments in each module.
 
 For examples of how to use them, you can refer to each of the individual [VAE-based architecture](https://github.com/VassilisCN/RV-VAE/tree/main/VAEs) modifications. Specifically, if you find in the code the flag `rv`, the `if` statement containing this flag changes the specific part of the code from the original to the RV-aware one.
 
