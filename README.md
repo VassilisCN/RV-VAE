@@ -71,15 +71,11 @@ You can check each of these three files individually to change any parameters/da
 
 If you include in your research Random Variable Modules or any parts of this project, please cite each respective work, if applicable, as well as this work:
 ```
-@inproceedings{Nicodemou023,
-  author = {Nicodemou, Vassilis C and Oikonomidis, Iason and Argyros, Antonis},
-  title = {RV-VAE: Integrating Random Variable Algebra into Variational Autoencoders},
-  booktitle = {International Conference on Computer Vision Workshops (ViPriors 2023 - ICCVW 2023), (to appear)},
-  publisher = {IEEE},
-  year = {2023},
-  month = {October},
-  address = {Paris, France},
-  projects =  {VMWARE,I.C.HUMANS},
-  pdflink = {http://users.ics.forth.gr/ argyros/mypapers/2023_10_VIPRIORS_Nicodemou.pdf}
+@inproceedings{nicodemou2023rv,
+  title={RV-VAE: Integrating Random Variable Algebra into Variational Autoencoders},
+  author={Nicodemou, Vassilis C and Oikonomidis, Iason and Argyros, Antonis},
+  booktitle={Proceedings of the IEEE/CVF International Conference on Computer Vision},
+  pages={196--205},
+  year={2023}
 }
 ```
